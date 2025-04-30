@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preschool Personality Assessment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
+    <style>
+        /* Style for the initial loading message */
+        #loading-message {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh; /* Center vertically */
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            color: #555;
+        }
+        /* Hide container initially */
+        .container {
+            display: none; /* Hidden by default, shown by script */
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-message">
+        <p><i class="fas fa-spinner fa-spin"></i> Loading application...</p>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="brain-icon"><i class="fas fa-child"></i></div>
+            <h1>Preschool Personality Assessment</h1>
+            <p class="tagline">Understanding Your Child's Unique Temperament</p>
+        </header>
+
+        <section id="login-section" class="hidden">
+             <h2>Login Required</h2>
+             <p style="text-align: center; margin-bottom: 20px;">You need to log in to access the assessment.</p>
+             <div class="button-group">
+                 <button id="login-btn" class="btn primary"><i class="fas fa-sign-in-alt"></i> Login / Sign Up</button>
+             </div>
+        </section>
+
+        <section id="welcome-section" class="hidden"></section>
+
+        <section id="age-group-selection" class="hidden">
+            <h2>Select Child's Age Group</h2>
+            <div class="form-group">
+                <label for="age-group">Age Group:</label>
+                <select id="age-group" aria-label="Select Age Group">
+                    <option value="">Select Age Group</option>
+                    <option value="Nursery">Nursery (Approx 3-4 yrs)</option>
+                    <option value="JrKG">Jr KG (Approx 4-5 yrs)</option>
+                    <option value="SrKG">Sr KG (Approx 5-6 yrs)</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button id="age-group-next-btn" class="btn primary"><i class="fas fa-arrow-right"></i> Next</button>
+                <button id="age-group-logout-btn" class="btn secondary hidden"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </section>
+
+        <section id="language-selection" class="hidden">
+            <h2>Select Survey Language</h2>
+            <div class="button-group language-buttons">
+                <button id="lang-en-btn" class="btn primary"><i class="fas fa-language"></i> English</button>
+                <button id="lang-mr-btn" class="btn primary"><i class="fas fa-language"></i> मराठी</button>
+            </div>
+             <div class="button-group navigation-buttons">
+                 <button id="lang-back-btn" class="btn secondary"><i class="fas fa-arrow-left"></i> Back</button>
+             </div>
+        </section>
+
+        <section id="info-section" class="hidden">
+            <h2 id="info-title">Child and Parent Information</h2>
+            <div id="info-step">
+                </div>
+            <div class="button-group navigation-buttons">
+                <button class="btn secondary" id="info-back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn primary" id="info-next-btn"><i class="fas fa-arrow-right"></i> Next</button>
+            </div>
+        </section>
+
+        <section id="instructions-section" class="hidden">
+            <h2 id="instructions-title">Parent Survey Instructions</h2>
+            <div id="instructions-content" class="instructions-box">
+                </div>
+            <div class="button-group navigation-buttons">
+                 <button id="instr-back-btn" class="btn secondary"><i class="fas fa-arrow-left"></i> Back</button>
+                 <button id="instr-start-btn" class="btn primary"><i class="fas fa-play"></i> Start Survey</button>
+            </div>
+        </section>
+
+        <section id="test-section" class="hidden">
+            <h2 id="test-title">Parent Survey</h2>
+            <div class="progress-container">
+                <p class="progress-label">Your Progress</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%;"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Question 0 of 40</div>
+            </div>
+            <div id="questions">
+                </div>
+            <div class="button-group navigation-buttons">
+                <button class="btn secondary" id="back-btn" ><i class="fas fa-arrow-left"></i> Back</button>
+                <button class="btn primary" id="next-btn" ><i class="fas fa-arrow-right"></i> Next</button>
+                <button class="btn success" id="submit-btn" ><i class="fas fa-check"></i> Submit Survey</button>
+            </div>
+        </section>
+
+        <section id="results-section" class="hidden">
+            <h2 id="results-title">Survey Results</h2>
+            <div id="result-content">
+                </div>
+            <div class="contact-message">
+                 <p><i class="fas fa-info-circle"></i> For detailed discussion and counseling regarding your child's development plan, please contact us. Share your result with admin now for further processing.</p>
+            </div>
+            <div class="button-group result-actions">
+                 <button id="results-whatsapp-btn" class="btn whatsapp-btn"><i class="fab fa-whatsapp"></i> Share on WhatsApp</button>
+                 <button id="results-email-btn" class="btn email-btn"><i class="fas fa-envelope"></i> Email Result</button>
+                 <button id="results-copy-btn" class="btn copy-btn"><i class="fas fa-copy"></i> Copy Result</button>
+                 <button id="results-logout-btn" class="btn secondary hidden"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </section>
+
+        <section id="admin-section" class="hidden">
+            <h2>Admin Dashboard</h2>
+
+            <div class="alert critical-warning" id="backup-alert-top">
+                 <h4><i class="fas fa-exclamation-triangle"></i> Critical Data Storage Notice</h4>
+                 <p><strong>Important:</strong> All parent/child data and survey results are stored locally in your browser's storage. This data is at risk of being permanently lost upon logout, browser closure, cache clearing, or device change. To prevent data loss, it is critical to <strong>immediately export all data to CSV</strong> using the provided export options below. Once data is cleared, it cannot be retrieved. Ensure regular backups to safeguard your records.</p>
+                 <div class="warning-actions button-group">
+                     <button id="admin-export-results-top-btn" class="btn export-btn"><i class="fas fa-file-csv"></i> Export Results to CSV</button>
+                     <button id="admin-export-info-top-btn" class="btn export-btn"><i class="fas fa-file-csv"></i> Export Parent/Child Info to CSV</button>
+                 </div>
+            </div>
+
+            <div class="admin-controls button-group">
+                <button id="admin-export-all-results-btn" class="btn export-btn"><i class="fas fa-file-csv"></i> Export All Results</button>
+                <button id="admin-clear-results-btn" class="btn danger"><i class="fas fa-trash"></i> Clear All Results</button>
+                <button id="admin-whatsapp-last-btn" class="btn whatsapp-btn"><i class="fab fa-whatsapp"></i> WhatsApp Last Result</button>
+                <button id="admin-email-last-btn" class="btn email-btn"><i class="fas fa-envelope"></i> Email Last Result</button>
+                 <button id="admin-logout-btn" class="btn secondary hidden"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+
+            <div class="admin-form">
+                <h3>Generate Child Development Plan</h3>
+                <div class="form-group">
+                    <label for="plan-student-name">Child's Name:</label>
+                    <input type="text" id="plan-student-name" placeholder="Enter child's name" aria-label="Child's Name" required>
+                </div>
+                 <div class="form-group">
+                    <label for="plan-age-group">Age Group:</label>
+                    <select id="plan-age-group" aria-label="Select Age Group" required>
+                        <option value="">Select Age Group</option>
+                        <option value="Nursery">Nursery (Approx 3-4 yrs)</option>
+                        <option value="JrKG">Jr KG (Approx 4-5 yrs)</option>
+                        <option value="SrKG">Sr KG (Approx 5-6 yrs)</option>
+                    </select>
+                </div>
+                 <div class="form-group">
+                    <label for="plan-unique-code">Unique Result Code:</label>
+                    <input type="text" id="plan-unique-code" placeholder="Enter 10-digit unique code" aria-label="Unique Result Code" required pattern="[0-5]{10}"> </div>
+                 <div class="form-group">
+                    <label for="plan-language-select">Plan Language:</label>
+                    <select id="plan-language-select" aria-label="Select Plan Language">
+                        <option value="english">English</option>
+                        <option value="marathi">Marathi</option>
+                    </select>
+                </div>
+                <div class="button-group">
+                     <button id="admin-generate-plan-btn" class="btn primary"><i class="fas fa-cogs"></i> Generate Plan</button>
+                </div>
+            </div>
+            <div id="plan-content" class="hidden">
+                <h3>Generated Development Plan</h3>
+                <div id="plan-text" class="plan-output-box"></div>
+                <div class="button-group">
+                    <button id="admin-copy-plan-btn" class="btn copy-btn"><i class="fas fa-copy"></i> Copy Plan</button>
+                    <button id="admin-whatsapp-plan-btn" class="btn whatsapp-btn"><i class="fab fa-whatsapp"></i> WhatsApp Plan</button>
+                    <button id="admin-email-plan-btn" class="btn email-btn"><i class="fas fa-envelope"></i> Email Plan</button>
+                </div>
+            </div>
+
+            <div class="admin-form">
+                <h3>Add/Update Parent/Child Information</h3>
+                 <div class="form-group">
+                     <label for="info-child-name">Child's Name:</label>
+                     <input type="text" id="info-child-name" placeholder="Enter child's name" aria-label="Child's Name" required>
+                 </div>
+                 <div class="form-group">
+                     <label for="info-parent-name">Parent's Name:</label>
+                     <input type="text" id="info-parent-name" placeholder="Enter parent's name" aria-label="Parent's Name" required>
+                 </div>
+                 <div class="form-group">
+                     <label for="info-mobile">Mobile (Parent):</label>
+                     <input type="tel" id="info-mobile" placeholder="Enter 10-digit mobile" aria-label="Mobile" required pattern="\d{10}">
+                 </div>
+                 <div class="form-group">
+                     <label for="info-email">Email (Parent):</label>
+                     <input type="email" id="info-email" placeholder="Enter email" aria-label="Email">
+                 </div>
+                 <div class="form-group">
+                     <label for="info-age-group-admin">Age Group:</label>
+                     <select id="info-age-group-admin" aria-label="Select Age Group" required>
+                         <option value="">Select Age Group</option>
+                         <option value="Nursery">Nursery</option>
+                         <option value="JrKG">Jr KG</option>
+                         <option value="SrKG">Sr KG</option>
+                     </select>
+                 </div>
+                 <div class="button-group">
+                    <button id="admin-save-info-btn" class="btn success"><i class="fas fa-save"></i> Save Info</button>
+                 </div>
+            </div>
+
+            <div id="student-info-content">
+                 <h3>Stored Parent/Child Information</h3>
+                 <div class="alert critical-warning" id="backup-alert-bottom">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Data Backup Reminder</h4>
+                    <p>Remember to regularly export parent/child information using the button below to prevent data loss.</p>
+                </div>
+                <div class="button-group">
+                    <button id="admin-export-info-btn" class="btn export-btn"><i class="fas fa-file-csv"></i> Export Info to CSV</button>
+                    <button id="admin-clear-info-btn" class="btn danger"><i class="fas fa-trash"></i> Clear All Info</button>
+                </div>
+                <div class="table-container">
+                     <table id="student-info-table">
+                        <thead>
+                            <tr>
+                                <th>Child Name</th>
+                                <th>Parent Name</th>
+                                <th>Mobile</th>
+                                <th>Email</th>
+                                <th>Age Group</th>
+                                <th>Submitted By (User Info)</th> </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="results-display-content">
+                 <h3>Stored Survey Results</h3>
+                  <div class="alert critical-warning" id="backup-alert-results">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Data Backup Reminder</h4>
+                    <p>Remember to regularly export survey results using the button below to prevent data loss.</p>
+                </div>
+                 <div class="button-group">
+                     <button id="admin-export-results-btn" class="btn export-btn"><i class="fas fa-file-csv"></i> Export All Results to CSV</button>
+                     <button id="admin-clear-results-main-btn" class="btn danger"><i class="fas fa-trash"></i> Clear All Results</button>
+                 </div>
+                 <div class="table-container">
+                    <table id="results-table">
+                         <thead>
+                            <tr>
+                                <th>Child Name</th>
+                                <th>Age Group</th>
+                                <th>Date</th>
+                                <th>Unique Code</th>
+                                <th>Summary</th>
+                                <th>Submitted By (User Info)</th> </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                 </div>
+            </div>
+        </section>
+        </div>
+
+    <script src="questions.js"></script>
+    <script src="results.js"></script>
+    <script src="plan.js"></script>
+    <script src="script.js"></script> </body>
+</html>
