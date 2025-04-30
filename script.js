@@ -430,47 +430,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -------- Language Selection Logic --------
+function setLanguage(languageName) {
+    console.log(`Setting language to: ${languageName}`);
+    // ... (keep the existing switch statement here) ...
 
-    function setLanguage(languageName) {
-        console.log(`Setting language to: ${languageName}`);
-        selectedLanguage = languageName;
+    // Add these lines for debugging:
+    console.log('--- Debugging Language Content ---');
+    console.log('Expected Instructions:', 'window.instructions' + languageName, !!window['instructions' + languageName]);
+    // Correctly handle the question file name swap for EN/MR
+    let expectedQuestionsVar = 'window.questions' + languageName;
+    if (languageName === 'English') expectedQuestionsVar = 'window.questionsMarathi';
+    else if (languageName === 'Marathi') expectedQuestionsVar = 'window.questionsEnglish';
+    console.log('Expected Questions:', expectedQuestionsVar, !!window[expectedQuestionsVar.replace('window.','')]);
 
-        // Load the correct content objects based on selected language
-        switch (languageName) {
-            case 'English':
-                currentInstructions = window.instructionsEnglish; //
-                currentQuestions = window.questionsMarathi; // English questions are in Marathi file
-                currentPlanPool = window.planEnglish; //
-                currentResultsConfig = window.resultsEnglish; //
-                break;
-            case 'Marathi':
-                currentInstructions = window.instructionsMarathi; //
-                currentQuestions = window.questionsEnglish; // Marathi questions are in English file
-                currentPlanPool = window.planMarathi; //
-                currentResultsConfig = window.resultsMarathi; //
-                break;
-            case 'Hindi':
-                currentInstructions = window.instructionsHindi; //
-                currentQuestions = window.questionsHindi; //
-                currentPlanPool = window.planHindi; //
-                currentResultsConfig = window.resultsHindi; //
-                break;
-            default:
-                console.warn(`Unsupported language: ${languageName}. Defaulting to English.`);
-                 currentInstructions = window.instructionsEnglish;
-                 currentQuestions = window.questionsMarathi; // English questions
-                 currentPlanPool = window.planEnglish;
-                 currentResultsConfig = window.resultsEnglish;
-                 selectedLanguage = 'English';
-        }
+    console.log('Expected Plan Pool:', 'window.plan' + languageName, !!window['plan' + languageName]);
+    console.log('Expected Results Config:', 'window.results' + languageName, !!window['results' + languageName]);
+    console.log('--- End Debugging ---');
 
-         // Validate that the loaded content exists
-         if (!currentInstructions || !currentQuestions || !currentPlanPool || !currentResultsConfig) {
-             showAlert('error', `Content for ${languageName} could not be loaded. Please check the language files.`);
-             // Potentially revert to English or stop the flow
-             setLanguage('English'); // Revert to English as a fallback
-             return; // Prevent moving forward if content missing
-         }
+    // The existing check:
+    if (!currentInstructions || !currentQuestions || !currentPlanPool || !currentResultsConfig) {
+        showAlert('error', `Content for ${languageName} could not be loaded. Please check the language files.`);
+        setLanguage('English'); // Revert to English as a fallback
+        return;
+    }
+
+    // ... (rest of the function) ...
+}
 
         // Proceed to Instructions
         instrTitle.textContent = selectedLanguage === 'Marathi' ? 'सूचना' : (selectedLanguage === 'Hindi' ? 'निर्देश' : 'Instructions');
